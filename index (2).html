@@ -1,0 +1,448 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.dash{padding:16px 0;max-width:100%}
+.section-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin:0 0 10px}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:20px}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;cursor:pointer;transition:border .15s}
+.kpi:hover{outline:1px solid var(--color-border-secondary)}
+.kpi-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:6px;font-weight:500}
+.kpi-val{font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1}
+.kpi-sub{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
+.kpi-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}
+.chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.chart-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px}
+.chart-card.full{grid-column:1/-1}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.filter-label{font-size:12px;color:var(--color-text-secondary)}
+select{font-size:12px;padding:4px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:11px;color:var(--color-text-secondary)}
+.legend-sq{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.bar-h{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.bar-label{font-size:11px;color:var(--color-text-secondary);width:130px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:14px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.bar-num{font-size:11px;color:var(--color-text-tertiary);width:30px;flex-shrink:0}
+.heatmap-grid{display:grid;gap:3px}
+.hm-cell{border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;height:36px;cursor:pointer;transition:opacity .15s}
+.hm-cell:hover{opacity:.8}
+.hm-labels-col{font-size:10px;color:var(--color-text-tertiary);display:flex;flex-direction:column;gap:3px;justify-content:flex-start;padding-top:20px}
+.hm-wrap{display:flex;gap:4px}
+.hm-col-labels{display:grid;gap:3px;font-size:10px;color:var(--color-text-tertiary);text-align:center}
+.insight-list{display:flex;flex-direction:column;gap:8px}
+.insight-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:border-color .15s}
+.insight-item:hover{border-color:var(--color-border-secondary)}
+.insight-num{font-size:16px;font-weight:500;min-width:26px;flex-shrink:0}
+.insight-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+.insight-text strong{font-weight:500;color:var(--color-text-primary)}
+.pill{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:500;margin-left:6px}
+.pill-teal{background:#E1F5EE;color:#0F6E56}
+.pill-amber{background:#FAEEDA;color:#854F0B}
+.pill-red{background:#FCEBEB;color:#A32D2D}
+.pill-blue{background:#E6F1FB;color:#185FA5}
+.waterfall-wrap{overflow-x:auto}
+.data-table{width:100%;border-collapse:collapse;font-size:11px}
+.data-table th{font-size:10px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);text-align:left;background:var(--color-background-secondary)}
+.data-table td{padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--color-background-secondary)}
+.badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:500}
+.badge-high{background:#FCEBEB;color:#A32D2D}
+.badge-med{background:#FAEEDA;color:#854F0B}
+.badge-low{background:#EAF3DE;color:#3B6D11}
+.badge-approved{background:#E1F5EE;color:#0F6E56}
+.badge-clinical{background:#E6F1FB;color:#185FA5}
+.badge-research{background:#EEEDFE;color:#534AB7}
+.tab-row{display:flex;gap:4px;margin-bottom:14px;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:0}
+.tab-btn{font-size:12px;padding:6px 14px;border:none;background:none;color:var(--color-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font-sans)}
+.tab-btn.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary)}
+.ai-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;font-size:12px;color:var(--color-text-secondary);line-height:1.6;border-left:2px solid #534AB7}
+.ai-card+.ai-card{margin-top:8px}
+</style>
+
+<div class="dash">
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">Nanotechnology in breast cancer treatment — interactive analytics dashboard</h2>
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+  <div>
+    <div style="font-size:18px;font-weight:500;color:var(--color-text-primary)">Nanotechnology in Breast Cancer Treatment</div>
+    <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:2px">Research Analytics Dashboard · Sacred Heart University Capstone · 2023</div>
+  </div>
+  <div style="display:flex;gap:6px">
+    <span class="pill pill-blue">Healthcare AI</span>
+    <span class="pill pill-teal">Portfolio Ready</span>
+  </div>
+</div>
+
+<div class="filter-row">
+  <span class="filter-label">Filter by:</span>
+  <select id="f-app" onchange="applyFilters()">
+    <option value="all">All applications</option>
+    <option value="Drug Delivery">Drug delivery</option>
+    <option value="Diagnosis">Diagnosis</option>
+    <option value="Immunotherapy">Immunotherapy</option>
+    <option value="Gene Therapy">Gene therapy</option>
+    <option value="Hyperthermia">Hyperthermia</option>
+  </select>
+  <select id="f-risk" onchange="applyFilters()">
+    <option value="all">All risk levels</option>
+    <option value="High">High risk</option>
+    <option value="Medium">Medium risk</option>
+    <option value="Low">Low risk</option>
+  </select>
+  <select id="f-stage" onchange="applyFilters()">
+    <option value="all">All stages</option>
+    <option value="Approved">Approved</option>
+    <option value="Clinical">Clinical trial</option>
+    <option value="Research">Research</option>
+  </select>
+  <select id="f-cancer" onchange="applyFilters()">
+    <option value="all">All cancer types</option>
+    <option value="TNBC">TNBC</option>
+    <option value="HER2+">HER2+</option>
+    <option value="Invasive Lobular">Invasive Lobular</option>
+    <option value="Metastatic">Metastatic</option>
+    <option value="All Breast">All Breast</option>
+  </select>
+  <button onclick="resetFilters()" style="font-size:12px;padding:4px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:none;color:var(--color-text-secondary);cursor:pointer">Reset</button>
+</div>
+
+<div class="section-label">Key performance indicators</div>
+<div class="kpi-grid">
+  <div class="kpi" onclick="sendPrompt('Tell me more about the 12 nanotechnology types in this research')">
+    <div class="kpi-label">Total technologies</div>
+    <div class="kpi-val" id="kpi-total">12</div>
+    <div class="kpi-sub">Across all categories</div>
+  </div>
+  <div class="kpi" onclick="sendPrompt('Which nanotechnologies have high effectiveness scores?')">
+    <div class="kpi-label">High effectiveness</div>
+    <div class="kpi-val" id="kpi-heff"><span style="font-size:13px;color:var(--color-text-tertiary)"></span><span id="kpi-heff-val">67%</span></div>
+    <div class="kpi-sub" id="kpi-heff-sub">8 of 12 technologies</div>
+  </div>
+  <div class="kpi" onclick="sendPrompt('What are the low-risk nanotechnologies in breast cancer treatment?')">
+    <div class="kpi-label">Low risk %</div>
+    <div class="kpi-val" id="kpi-lowrisk">33%</div>
+    <div class="kpi-sub" id="kpi-lrsub">4 of 12 technologies</div>
+  </div>
+  <div class="kpi" onclick="sendPrompt('Which nanotechnologies have reached clinical approval?')">
+    <div class="kpi-label">Clinical / approved</div>
+    <div class="kpi-val" id="kpi-clin">42%</div>
+    <div class="kpi-sub" id="kpi-clinsub">5 of 12 technologies</div>
+  </div>
+  <div class="kpi" onclick="sendPrompt('What is the translational gap in cancer nanotechnology?')">
+    <div class="kpi-label">Avg effectiveness</div>
+    <div class="kpi-val" id="kpi-avg">7.1<span style="font-size:13px;color:var(--color-text-tertiary)">/10</span></div>
+    <div class="kpi-sub">Weighted score</div>
+  </div>
+</div>
+
+<div class="tab-row">
+  <button class="tab-btn active" onclick="showTab('visuals',this)">Visuals</button>
+  <button class="tab-btn" onclick="showTab('dataset',this)">Dataset</button>
+  <button class="tab-btn" onclick="showTab('ai',this)">AI insights</button>
+  <button class="tab-btn" onclick="showTab('insights',this)">Top insights</button>
+</div>
+
+<div id="tab-visuals">
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="card-title">Effectiveness by nanotechnology type</div>
+      <div class="legend-row">
+        <span><span class="legend-sq" style="background:#378ADD"></span>Effectiveness score</span>
+        <span><span class="legend-sq" style="background:#E24B4A"></span>High risk</span>
+        <span><span class="legend-sq" style="background:#1D9E75"></span>Low risk</span>
+      </div>
+      <div id="bar-chart-eff"></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-title">Application area distribution</div>
+      <div style="position:relative;width:100%;height:200px"><canvas id="pieChart" role="img" aria-label="Pie chart: Drug Delivery 42%, Diagnosis 17%, Immunotherapy 17%, Gene Therapy 17%, Hyperthermia 8%">Drug Delivery 42%, Diagnosis 17%, Immunotherapy 17%, Gene Therapy 17%, Hyperthermia 8%.</canvas></div>
+      <div class="legend-row" style="margin-top:10px;justify-content:center">
+        <span><span class="legend-sq" style="background:#378ADD"></span>Drug delivery</span>
+        <span><span class="legend-sq" style="background:#1D9E75"></span>Diagnosis</span>
+        <span><span class="legend-sq" style="background:#534AB7"></span>Immunotherapy</span>
+        <span><span class="legend-sq" style="background:#EF9F27"></span>Gene therapy</span>
+        <span><span class="legend-sq" style="background:#D85A30"></span>Hyperthermia</span>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-title">Risk vs benefit matrix (heatmap)</div>
+      <div class="hm-wrap">
+        <div class="hm-labels-col" id="hm-row-labels"></div>
+        <div>
+          <div class="hm-col-labels" id="hm-col-labels" style="display:flex;gap:3px;margin-bottom:3px;padding-left:0"></div>
+          <div class="heatmap-grid" id="heatmap" style="grid-template-columns:repeat(3,56px)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-title">Stage of development distribution</div>
+      <div style="position:relative;width:100%;height:200px"><canvas id="stageChart" role="img" aria-label="Bar chart of development stages: Research 58%, Clinical Trial 25%, Approved 17%">Research 58%, Clinical 25%, Approved 17%.</canvas></div>
+    </div>
+
+    <div class="chart-card full">
+      <div class="card-title">Traditional vs nanotechnology comparison — key metrics</div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="compChart" role="img" aria-label="Grouped bar chart comparing traditional vs nanotech across 5 metrics">Comparison of traditional vs nanotech treatments.</canvas></div>
+    </div>
+  </div>
+</div>
+
+<div id="tab-dataset" style="display:none">
+  <div class="chart-card full" style="margin-bottom:0">
+    <div class="card-title">Structured dataset — nanotechnology types (12 records)</div>
+    <div style="overflow-x:auto">
+    <table class="data-table" id="data-table">
+      <thead><tr>
+        <th>Technology type</th><th>Application</th><th>Cancer type</th><th>Mechanism</th><th>Effectiveness</th><th>Risk</th><th>Stage</th><th>Cost</th><th>Benefit score</th>
+      </tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<div id="tab-ai" style="display:none">
+  <div class="section-label">AI-powered insights & automation opportunities</div>
+  <div class="ai-card"><strong>Pattern detected:</strong> Nanocarrier-based drug delivery systems achieve 20–50% higher tumor accumulation vs traditional methods, but only 17% are currently approved. The gap suggests a regulatory bottleneck, not a scientific one — AI could prioritize which candidates to advance based on safety profiles.</div>
+  <div class="ai-card"><strong>Risk prediction:</strong> Technologies with High risk scores (Quantum Dots, Carbon Nanotubes, Magnetic Nanoparticles) share a common trait — systemic toxicity potential. An ML classifier trained on nanoparticle physical properties (size, shape, surface charge) could predict toxicity risk at design stage, reducing failed trials.</div>
+  <div class="ai-card"><strong>Translation gap alert:</strong> 7 of 12 technologies remain in research stage despite strong preclinical evidence. AI-driven literature synthesis (like this review) can accelerate systematic reviews by 60–80%, helping bridge the bench-to-bedside gap faster.</div>
+  <div class="ai-card"><strong>Combination therapy optimization:</strong> Chemo-immunotherapy via nanocarriers (Raikwar et al., 2022) shows the highest combined effectiveness score (9/10). A reinforcement learning model could optimize nanocarrier formulation for patient-specific tumor microenvironments.</div>
+  <div class="ai-card"><strong>Drug resistance modeling:</strong> HER2+ breast cancer has 40–50% drug resistance rates. Predictive AI models on tumor genomics + nanoparticle pharmacokinetics could identify resistance pathways earlier, enabling proactive formulation adjustment.</div>
+  <div class="ai-card"><strong>Cost reduction pathway:</strong> High-cost technologies (Dendrimers, Carbon Nanotubes) have excellent effectiveness but limited adoption. AI-driven synthesis optimization and batch process modeling could reduce manufacturing cost by an estimated 30–40%, based on analogous pharmaceutical optimization studies.</div>
+</div>
+
+<div id="tab-insights" style="display:none">
+  <div class="section-label">Top 5 research insights with business impact</div>
+  <div class="insight-list">
+    <div class="insight-item" onclick="sendPrompt('Explain nanocarrier drug delivery advantages over traditional chemotherapy')">
+      <div class="insight-num" style="color:#378ADD">01</div>
+      <div class="insight-text"><strong>Nanocarriers increase tumor drug concentration by 20%+</strong> — Raikwar et al. (2022) demonstrated that nanocarrier delivery increases drug accumulation at tumor sites by over 20% vs systemic chemotherapy. This directly translates to lower required dosages, reduced side effects, and improved patient quality of life. <span class="pill pill-teal">High impact</span></div>
+    </div>
+    <div class="insight-item" onclick="sendPrompt('What is the translational gap in cancer nanotechnology research?')">
+      <div class="insight-num" style="color:#534AB7">02</div>
+      <div class="insight-text"><strong>Critical translational gap: strong research, few approvals</strong> — Alshehri et al. (2020) highlighted that despite hundreds of promising preclinical studies, only a handful of nanomedicines have reached clinical approval. This represents a systemic inefficiency — a gap that data engineering and AI-powered trial matching could significantly shorten. <span class="pill pill-amber">Operational gap</span></div>
+    </div>
+    <div class="insight-item" onclick="sendPrompt('How does nanotechnology help with drug resistance in HER2+ breast cancer?')">
+      <div class="insight-num" style="color:#D85A30">03</div>
+      <div class="insight-text"><strong>40–50% drug resistance in HER2+ — nano combinations show promise</strong> — Ansari et al. (2021) showed that combined nanotech approaches (paclitaxel + miRNA delivery) demonstrate superior outcomes in drug-resistant cases. This is clinically significant for the ~30% of breast cancer patients who are HER2+. <span class="pill pill-red">Clinical urgency</span></div>
+    </div>
+    <div class="insight-item" onclick="sendPrompt('What are the safety concerns with nanoparticles in breast cancer treatment?')">
+      <div class="insight-num" style="color:#1D9E75">04</div>
+      <div class="insight-text"><strong>Safety validation is the primary bottleneck for clinical adoption</strong> — Zhang et al. (2019) identified that toxicity, nonspecific binding, and lack of standardized assessment methods are the top barriers to clinical translation. Establishing FDA-aligned safety benchmarks via ML toxicity modeling could accelerate approval timelines. <span class="pill pill-teal">Regulatory pathway</span></div>
+    </div>
+    <div class="insight-item" onclick="sendPrompt('What are the most promising nanotechnologies for TNBC treatment?')">
+      <div class="insight-num" style="color:#EF9F27">05</div>
+      <div class="insight-text"><strong>TNBC remains the hardest subtype — nanoformulations offer new hope</strong> — Torres Quintas et al. (2023) and Jain et al. (2020) both identified that Triple Negative Breast Cancer (TNBC) — the most aggressive subtype with no hormone receptor targets — shows the greatest potential benefit from nanoformulation strategies, including polymeric nanoparticles and lipid-based carriers. <span class="pill pill-blue">Research priority</span></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const ALL_DATA = [
+  {tech:"Liposomes",app:"Drug Delivery",cancer:"All Breast",mechanism:"Lipid bilayer encapsulation for drug transport",eff:8,risk:"Low",stage:"Approved",cost:"Medium",benefit:8},
+  {tech:"Polymeric NPs",app:"Drug Delivery",cancer:"TNBC",mechanism:"Controlled release polymer matrix",eff:8,risk:"Low",stage:"Clinical",cost:"Medium",benefit:8},
+  {tech:"Magnetic NPs",app:"Hyperthermia",cancer:"All Breast",mechanism:"Hyperthermia + targeted drug delivery",eff:7,risk:"Medium",stage:"Clinical",cost:"High",benefit:7},
+  {tech:"siRNA Nanovectors",app:"Gene Therapy",cancer:"TNBC",mechanism:"Non-viral siRNA delivery to silence oncogenes",eff:8,risk:"Medium",stage:"Research",cost:"High",benefit:7},
+  {tech:"Nanorobots",app:"Drug Delivery",cancer:"Invasive Lobular",mechanism:"Targeted paclitaxel + miRNA delivery",eff:9,risk:"High",stage:"Research",cost:"Very High",benefit:9},
+  {tech:"Dendrimers",app:"Drug Delivery",cancer:"HER2+",mechanism:"Multi-functional branched polymer carriers",eff:7,risk:"Medium",stage:"Research",cost:"High",benefit:7},
+  {tech:"Gold Nanoparticles",app:"Diagnosis",cancer:"All Breast",mechanism:"Surface-enhanced imaging and detection",eff:8,risk:"Low",stage:"Clinical",cost:"High",benefit:8},
+  {tech:"Carbon Nanotubes",app:"Drug Delivery",cancer:"Metastatic",mechanism:"High surface area drug loading + delivery",eff:6,risk:"High",stage:"Research",cost:"High",benefit:5},
+  {tech:"Quantum Dots",app:"Diagnosis",cancer:"All Breast",mechanism:"Fluorescent imaging and biomarker detection",eff:7,risk:"High",stage:"Research",cost:"High",benefit:6},
+  {tech:"Micelles",app:"Drug Delivery",cancer:"TNBC",mechanism:"Amphiphilic self-assembly for hydrophobic drugs",eff:7,risk:"Low",stage:"Approved",cost:"Medium",benefit:7},
+  {tech:"Nanoformulations",app:"Drug Delivery",cancer:"TNBC",mechanism:"Enhanced solubility + extended circulation time",eff:8,risk:"Medium",stage:"Clinical",cost:"Medium",benefit:8},
+  {tech:"Nanocarriers (combo)",app:"Immunotherapy",cancer:"HER2+",mechanism:"Combined chemo-immunotherapy delivery",eff:9,risk:"Medium",stage:"Research",cost:"High",benefit:9},
+];
+
+let filteredData = [...ALL_DATA];
+
+function applyFilters(){
+  const fApp=document.getElementById('f-app').value;
+  const fRisk=document.getElementById('f-risk').value;
+  const fStage=document.getElementById('f-stage').value;
+  const fCancer=document.getElementById('f-cancer').value;
+  filteredData=ALL_DATA.filter(d=>{
+    if(fApp!=='all'&&d.app!==fApp)return false;
+    if(fRisk!=='all'&&d.risk!==fRisk)return false;
+    if(fStage!=='all'&&d.stage!==fStage)return false;
+    if(fCancer!=='all'&&d.cancer!==fCancer)return false;
+    return true;
+  });
+  updateKPIs();
+  renderBarChart();
+  renderTable();
+}
+
+function resetFilters(){
+  ['f-app','f-risk','f-stage','f-cancer'].forEach(id=>{document.getElementById(id).value='all'});
+  filteredData=[...ALL_DATA];
+  updateKPIs();
+  renderBarChart();
+  renderTable();
+}
+
+function updateKPIs(){
+  const n=filteredData.length;
+  const heff=filteredData.filter(d=>d.eff>=8).length;
+  const lowR=filteredData.filter(d=>d.risk==='Low').length;
+  const clin=filteredData.filter(d=>d.stage==='Clinical'||d.stage==='Approved').length;
+  const avg=n?Math.round(filteredData.reduce((s,d)=>s+d.eff,0)/n*10)/10:0;
+  document.getElementById('kpi-total').textContent=n;
+  document.getElementById('kpi-heff-val').textContent=n?(Math.round(heff/n*100))+'%':'0%';
+  document.getElementById('kpi-heff-sub').textContent=heff+' of '+n+' technologies';
+  document.getElementById('kpi-lowrisk').textContent=n?(Math.round(lowR/n*100))+'%':'0%';
+  document.getElementById('kpi-lrsub').textContent=lowR+' of '+n+' technologies';
+  document.getElementById('kpi-clin').textContent=n?(Math.round(clin/n*100))+'%':'0%';
+  document.getElementById('kpi-clinsub').textContent=clin+' of '+n+' technologies';
+  document.getElementById('kpi-avg').innerHTML=avg+'<span style="font-size:13px;color:var(--color-text-tertiary)">/10</span>';
+}
+
+function renderBarChart(){
+  const sorted=[...filteredData].sort((a,b)=>b.eff-a.eff);
+  const wrap=document.getElementById('bar-chart-eff');
+  wrap.innerHTML='';
+  const max=10;
+  sorted.forEach(d=>{
+    const pct=(d.eff/max*100).toFixed(0);
+    const color=d.risk==='High'?'#E24B4A':d.risk==='Low'?'#1D9E75':'#378ADD';
+    const row=document.createElement('div');
+    row.className='bar-h';
+    row.innerHTML=`<div class="bar-label" title="${d.tech}">${d.tech}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="bar-num">${d.eff}/10</div>`;
+    wrap.appendChild(row);
+  });
+}
+
+function renderTable(){
+  const tb=document.getElementById('table-body');
+  tb.innerHTML='';
+  filteredData.forEach(d=>{
+    const rBadge=d.risk==='High'?'badge-high':d.risk==='Medium'?'badge-med':'badge-low';
+    const sBadge=d.stage==='Approved'?'badge-approved':d.stage==='Clinical'?'badge-clinical':'badge-research';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="font-weight:500;color:var(--color-text-primary)">${d.tech}</td>
+      <td>${d.app}</td><td>${d.cancer}</td>
+      <td style="max-width:180px;font-size:10px">${d.mechanism}</td>
+      <td>${d.eff}/10</td>
+      <td><span class="badge ${rBadge}">${d.risk}</span></td>
+      <td><span class="badge ${sBadge}">${d.stage}</span></td>
+      <td>${d.cost}</td><td>${d.benefit}/10</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderHeatmap(){
+  const riskLevels=['Low','Medium','High'];
+  const benefitLevels=['Low (1-5)','Medium (6-7)','High (8-10)'];
+  const matrix=[[0,0,0],[0,0,0],[0,0,0]];
+  ALL_DATA.forEach(d=>{
+    const ri=riskLevels.indexOf(d.risk);
+    const bi=d.benefit<=5?0:d.benefit<=7?1:2;
+    if(ri>=0)matrix[ri][bi]++;
+  });
+  const colors=[
+    ['#9FE1CB','#5DCAA5','#1D9E75'],
+    ['#FAC775','#EF9F27','#BA7517'],
+    ['#F7C1C1','#F09595','#E24B4A']
+  ];
+  const textColors=[
+    ['#085041','#04342C','#04342C'],
+    ['#633806','#412402','#412402'],
+    ['#791F1F','#501313','#501313']
+  ];
+  const hm=document.getElementById('heatmap');
+  hm.innerHTML='';
+  const colLabels=document.getElementById('hm-col-labels');
+  colLabels.innerHTML='';
+  const rowLabels=document.getElementById('hm-row-labels');
+  rowLabels.innerHTML='';
+  colLabels.style.display='flex';colLabels.style.gap='3px';
+  benefitLevels.forEach(b=>{
+    const s=document.createElement('div');
+    s.style.cssText='width:56px;font-size:9px;color:var(--color-text-tertiary);text-align:center;line-height:1.2';
+    s.textContent=b;
+    colLabels.appendChild(s);
+  });
+  riskLevels.forEach((r,ri)=>{
+    const rl=document.createElement('div');
+    rl.style.cssText='font-size:9px;color:var(--color-text-tertiary);height:36px;display:flex;align-items:center;margin-bottom:3px;white-space:nowrap;padding-right:4px;line-height:1';
+    rl.textContent=r+' risk';
+    rowLabels.appendChild(rl);
+    benefitLevels.forEach((_,bi)=>{
+      const cell=document.createElement('div');
+      cell.className='hm-cell';
+      cell.style.background=colors[ri][bi];
+      cell.style.color=textColors[ri][bi];
+      cell.textContent=matrix[ri][bi];
+      cell.title=`${r} risk, ${benefitLevels[bi]}: ${matrix[ri][bi]} technologies`;
+      hm.appendChild(cell);
+    });
+  });
+}
+
+let pieC,stageC,compC;
+function renderPie(){
+  const ctx=document.getElementById('pieChart').getContext('2d');
+  if(pieC)pieC.destroy();
+  pieC=new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['Drug delivery','Diagnosis','Immunotherapy','Gene therapy','Hyperthermia'],
+      datasets:[{data:[5,2,2,2,1],backgroundColor:['#378ADD','#1D9E75','#534AB7','#EF9F27','#D85A30'],borderWidth:0,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw} technologies`}}}}
+  });
+}
+function renderStage(){
+  const ctx=document.getElementById('stageChart').getContext('2d');
+  if(stageC)stageC.destroy();
+  stageC=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Research','Clinical trial','Approved'],
+      datasets:[{label:'Technologies',data:[7,3,2],backgroundColor:['#EEEDFE','#E6F1FB','#E1F5EE'],borderColor:['#534AB7','#378ADD','#1D9E75'],borderWidth:1}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:10,ticks:{stepSize:2,font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+function renderComp(){
+  const ctx=document.getElementById('compChart').getContext('2d');
+  if(compC)compC.destroy();
+  compC=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Tumor targeting','Side effect profile','Drug resistance handling','Diagnostic precision','Treatment efficacy'],
+      datasets:[
+        {label:'Traditional treatment',data:[3.5,3,2.5,5,5.5],backgroundColor:'rgba(136,135,128,0.3)',borderColor:'#888780',borderWidth:1,borderDash:[4,4]},
+        {label:'Nanotechnology',data:[8.5,7.5,7,7.5,8],backgroundColor:'rgba(55,138,221,0.35)',borderColor:'#378ADD',borderWidth:1}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index'}},scales:{y:{beginAtZero:true,max:10,ticks:{font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},x:{ticks:{font:{size:10},maxRotation:30},grid:{display:false}}}}
+  });
+}
+
+function showTab(tab,btn){
+  ['visuals','dataset','ai','insights'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===tab?'':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='visuals'){
+    setTimeout(()=>{renderPie();renderStage();renderComp();},50);
+  }
+}
+
+renderBarChart();
+renderHeatmap();
+renderTable();
+updateKPIs();
+setTimeout(()=>{renderPie();renderStage();renderComp();},200);
+</script>
